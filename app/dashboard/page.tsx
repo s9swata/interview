@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, FileText, Loader2, Upload, Clock } from 'lucide-react';
+import { Calendar, FileText, Video, Activity, Award, BookOpen, Users, Search, Loader2, Clock, Upload } from 'lucide-react';
 import Link from 'next/link';
 
 interface DashboardStats {
@@ -24,7 +24,7 @@ interface UpcomingInterview {
   resume_id: string | null;
 }
 
-export default function DashboardPage() {
+export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats>({
@@ -35,18 +35,6 @@ export default function DashboardPage() {
   });
   const [upcomingInterviews, setUpcomingInterviews] = useState<UpcomingInterview[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login');
-    }
-  }, [user, authLoading, router]);
-
-  useEffect(() => {
-    if (user) {
-      fetchDashboardData();
-    }
-  }, [user]);
 
   const fetchDashboardData = async () => {
     try {
@@ -83,6 +71,18 @@ export default function DashboardPage() {
     }
   };
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [authLoading, user, router]);
+
+  useEffect(() => {
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
+
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -95,142 +95,151 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-slate-50">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Dashboard</h1>
-          <p className="text-slate-600">Welcome back! Here's your interview overview</p>
+          <h1 className="text-3xl font-bold text-slate-900">Welcome back{user?.email ? `, ${user.email.split('@')[0]}` : ''}</h1>
+          <p className="mt-2 text-slate-600">Prepare for your next interview with Evalve</p>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <Card className="hover:shadow-lg transition-all cursor-pointer">
+            <CardHeader className="flex flex-row items-center space-y-0 gap-4">
+              <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                <Video className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Start Interview</CardTitle>
+                <CardDescription>Begin a new mock interview session</CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all cursor-pointer">
+            <CardHeader className="flex flex-row items-center space-y-0 gap-4">
+              <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Schedule Interview</CardTitle>
+                <CardDescription>Book a future interview slot</CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all cursor-pointer">
+            <CardHeader className="flex flex-row items-center space-y-0 gap-4">
+              <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
+                <FileText className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Upload Resume</CardTitle>
+                <CardDescription>Update your resume for review</CardDescription>
+              </div>
+            </CardHeader>
+          </Card>
+        </div>
+
+        {/* Interview Categories */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold text-slate-900 mb-6">Interview Categories</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <Card className="hover:shadow-lg transition-all cursor-pointer">
+              <CardContent className="pt-6">
+                <div className="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center mb-4">
+                  <BookOpen className="h-6 w-6 text-amber-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Technical Skills</h3>
+                <p className="text-sm text-slate-600">Data Structures, Algorithms, System Design</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-all cursor-pointer">
+              <CardContent className="pt-6">
+                <div className="w-12 h-12 rounded-lg bg-rose-100 flex items-center justify-center mb-4">
+                  <Users className="h-6 w-6 text-rose-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Behavioral</h3>
+                <p className="text-sm text-slate-600">Leadership, Teamwork, Problem-solving</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-all cursor-pointer">
+              <CardContent className="pt-6">
+                <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mb-4">
+                  <Search className="h-6 w-6 text-indigo-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Role-specific</h3>
+                <p className="text-sm text-slate-600">Frontend, Backend, Full Stack, DevOps</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-all cursor-pointer">
+              <CardContent className="pt-6">
+                <div className="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center mb-4">
+                  <Award className="h-6 w-6 text-teal-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">System Design</h3>
+                <p className="text-sm text-slate-600">Architecture, Scalability, Best practices</p>
+              </CardContent>
+            </Card>
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Resumes</CardTitle>
-                  <FileText className="h-4 w-4 text-blue-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalResumes}</div>
-                  <p className="text-xs text-slate-500 mt-1">Uploaded resumes</p>
-                </CardContent>
-              </Card>
+        </div>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Interviews</CardTitle>
-                  <Calendar className="h-4 w-4 text-green-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalInterviews}</div>
-                  <p className="text-xs text-slate-500 mt-1">All time interviews</p>
-                </CardContent>
-              </Card>
+        {/* Statistics */}
+        <div>
+          <h2 className="text-2xl font-semibold text-slate-900 mb-6">Your Progress</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <Activity className="h-8 w-8 text-blue-600" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">Interviews Completed</p>
+                    <h4 className="text-2xl font-bold text-slate-900">12</h4>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Upcoming</CardTitle>
-                  <Clock className="h-4 w-4 text-orange-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.upcomingInterviews}</div>
-                  <p className="text-xs text-slate-500 mt-1">Scheduled interviews</p>
-                </CardContent>
-              </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <Award className="h-8 w-8 text-green-600" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">Average Score</p>
+                    <h4 className="text-2xl font-bold text-slate-900">85%</h4>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Completed</CardTitle>
-                  <Calendar className="h-4 w-4 text-purple-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.completedInterviews}</div>
-                  <p className="text-xs text-slate-500 mt-1">Finished interviews</p>
-                </CardContent>
-              </Card>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <BookOpen className="h-8 w-8 text-purple-600" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">Topics Covered</p>
+                    <h4 className="text-2xl font-bold text-slate-900">8</h4>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                  <CardDescription>Get started with your interview preparation</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Link href="/resume" className="block">
-                    <Button className="w-full justify-start" variant="outline" size="lg">
-                      <Upload className="w-5 h-5 mr-3" />
-                      Upload Resume
-                    </Button>
-                  </Link>
-                  <Link href="/schedule" className="block">
-                    <Button className="w-full justify-start" size="lg">
-                      <Calendar className="w-5 h-5 mr-3" />
-                      Schedule Interview
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Upcoming Interviews</CardTitle>
-                  <CardDescription>Your next scheduled sessions</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {upcomingInterviews.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Calendar className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                      <p className="text-slate-500 text-sm">No upcoming interviews</p>
-                      <Link href="/schedule">
-                        <Button className="mt-3" size="sm">
-                          Schedule One
-                        </Button>
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {upcomingInterviews.map((interview) => (
-                        <div
-                          key={interview.id}
-                          className="p-3 border border-slate-200 rounded-lg hover:border-blue-300 transition-colors"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-slate-900">
-                                {new Date(interview.scheduled_date).toLocaleDateString('en-US', {
-                                  weekday: 'short',
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
-                              </p>
-                              <p className="text-sm text-slate-600">
-                                {new Date(interview.scheduled_date).toLocaleTimeString('en-US', {
-                                  hour: 'numeric',
-                                  minute: '2-digit',
-                                })}{' '}
-                                • {interview.duration_minutes} min
-                              </p>
-                            </div>
-                            <Link href="/schedule">
-                              <Button variant="ghost" size="sm">
-                                View
-                              </Button>
-                            </Link>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </>
-        )}
-      </div>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <Calendar className="h-8 w-8 text-amber-600" />
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">Next Interview</p>
+                    <h4 className="text-2xl font-bold text-slate-900">Today</h4>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

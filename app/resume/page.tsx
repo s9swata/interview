@@ -67,12 +67,33 @@ export default function ResumePage() {
     setSuccess('');
 
     try {
-      const { data, error } = await supabase
+      const res = await fetch(`/api/upload-url?file=${file.name}`);
+
+      if (!res.ok) {
+        throw new Error('Failed to get upload URL');
+      }
+
+      const { presignedUrl, key } = await res.json();
+
+      const fileUpload = await fetch(presignedUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+        }
+      });
+
+      if (!fileUpload.ok) {
+        throw new Error('Failed to upload file');
+      }
+
+      // Save the record in Supabase
+      const { error } = await supabase
         .from('resumes')
         .insert({
           user_id: user.id,
           file_name: file.name,
-          file_url: `placeholder-url/${file.name}`,
+          file_url: `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${key}`,
           file_size: file.size,
         })
         .select()
